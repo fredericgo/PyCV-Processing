@@ -1,3 +1,3 @@
 # Todo
-- [] JSON message passing
-- [] Error handling
+- [ ] JSON message passing
+- [ ] Error handling
