@@ -1,15 +1,4 @@
 #! /usr/bin/env python
-
-
-# config must be done before any kivy.core.window import
-if __name__ == '__main__':
-    from kivy.config import Config
-    Config.set('graphics','show_cursor',1)
-    Config.set('graphics','fullscreen',0)
-    # Config.set('graphics','width',640)
-    # Config.set('graphics','height',480)
-    Config.write()
-
 from kivy.app import App
 from kivy.uix.widget import Widget
 from kivy.uix.boxlayout import BoxLayout
@@ -19,9 +8,6 @@ from kivy.graphics.texture import Texture
 
 import cv2
 import numpy as np
-
-
-
 
 class CamApp(App):
 
