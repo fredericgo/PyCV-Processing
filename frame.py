@@ -1,4 +1,4 @@
-from Tkinter import Tk, RIGHT, BOTH, GROOVE, Label
+from Tkinter import Tk, RIGHT, BOTH, GROOVE, Label, OptionMenu, StringVar, Scale, HORIZONTAL, Spinbox, DoubleVar
 from ttk import Frame, Button, Style
 from PIL import Image, ImageTk
 import cv2
@@ -13,6 +13,8 @@ class ImageFrame(Frame):
 
     def setup(self):
         self.capture = cv2.VideoCapture(0)
+        self.key = StringVar()
+        self.val = DoubleVar()
 
 
     def initUI(self):
@@ -31,6 +33,16 @@ class ImageFrame(Frame):
         closeButton.pack(side=RIGHT)
         okButton = Button(self, text="OK")
         okButton.pack(side=RIGHT)
+
+        options = [item for item in dir(cv2.cv) if item.startswith("CV_CAP_PROP")]
+        option = OptionMenu(self, self.key, *options)
+        self.key.set(options[0])
+        option.pack(side="left")
+
+        spin = Spinbox(self, from_=0, to=1, increment=0.05)
+        self.val = spin.get()
+        spin.pack(side="left")
+
 
     def schedule(self):
         def captureImg():
@@ -53,7 +65,6 @@ class ImageFrame(Frame):
 
 
 def main():
-
     root = Tk()
     root.geometry("800x600+300+300")
     app = ImageFrame(root)
