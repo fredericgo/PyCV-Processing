@@ -1,56 +1,48 @@
 #! /usr/bin/env python
-from kivy.app import App
-from kivy.uix.widget import Widget
-from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.image import Image
-from kivy.clock import Clock
-from kivy.graphics.texture import Texture
 
-import cv2
 import numpy as np
+import Tkinter
+from PIL import Image, ImageTk
+import cv2
+from Tkinter import Tk, RIGHT, BOTH, RAISED
+from ttk import Frame, Button, Style
 
-class CamApp(App):
 
-    def build(self):
-        self.img1 = Image()
-        self.img1.on_touch_down = self.on_touch_down
-        layout = BoxLayout()
-        layout.add_widget(self.img1)
         # opencv2 stuffs
-        self.capture = cv2.VideoCapture(0)
+capture = cv2.VideoCapture(0)
         # do the matching
-        self.orb = cv2.ORB()
-        self.kp, self.des = None, None
-        self.bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
+orb = cv2.ORB()
+kp, des = None, None
+bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
 
-        ret, self.frame = self.capture.read()
-        Clock.schedule_interval(self.update, 1.0/60.0)
-        return layout
+ret, frame = capture.read()
 
-    def on_touch_down(self,touch):
-        self.kp, self.des = self.orb.detectAndCompute(self.frame,None)
-        return True
-        
-    def update(self, dt):
-        # display image from cam in opencv window
-        ret, frame = self.capture.read()
-        # convert it to texture
-        if self.kp != None:
-            kp, des = self.orb.detectAndCompute(frame,None)
-            matches = self.bf.match(self.des,des)
-            matches = sorted(matches, key = lambda x:x.distance)
-            print 'len =', len(matches), type(matches[0]), matches[0]
-            # frame = cv2.drawMatches(self.frame, self.kp, frame, kp, matches[:10], flags=2)
+        # A root window for displaying objects
+root = Tkinter.Tk()
+ret, frame = capture.read()
+    # Convert the Image object into a TkPhoto object
+im = Image.fromarray(frame)
+imgtk = ImageTk.PhotoImage(image=im)
+panel = Tkinter.Label(root, image = imgtk)
+panel.pack(side = "bottom", fill = "both", expand = "yes")
 
-        buf1 = cv2.flip(frame, -1)
-        buf = buf1.tostring()
-        texture1 = Texture.create(size=(frame.shape[1], frame.shape[0]), colorfmt='bgr')
-        texture1.blit_buffer(buf, colorfmt='bgr', bufferfmt='ubyte')
-        # display image from the texture
-        self.img1.texture = texture1
+def captureImg():
+    ret, frame = capture.read()
+    # Convert the Image object into a TkPhoto object
+    b,g,r = cv2.split(frame)
+    frame = cv2.merge((r,g,b))
 
-    def on_stop(self):
-        self.capture.release()
+    im = Image.fromarray(frame)
+    imgtk = ImageTk.PhotoImage(image=im)
 
-if __name__ == '__main__':
-    CamApp().run()
+
+    # Put it in the display window
+    panel.configure(image = imgtk)
+    panel.image = imgtk
+    root.after(100, captureImg)
+
+
+root.after(100, captureImg)
+
+root.mainloop() # Start the GUI
+
